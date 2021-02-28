@@ -1,0 +1,807 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: SberCloud Hackathon By QuinTeam
+
+servers:
+  - url: http://37.230.195.51:8080/v1
+
+paths:
+  /login:
+    post:
+      summary: Login on backend (for farther operations)
+      tags:
+        - Identity and Access Management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        description: Describes user of SberCloud
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LoginResponse"
+        '401':
+          description: Invalid credentials
+
+  /projects:
+    post:
+      summary: Provides information about user's projects
+      tags:
+        - Identity and Access Management
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjectsResponse"
+        '401':
+          description: Invalid token
+
+  /eye/metric_list:
+    post:
+      summary: Describes metrics that aviablable for certain project
+      tags:
+        - Cloud Eye
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EyeMetricListRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EyeMetricListResponse"
+        '401':
+          description: Invalid token
+
+  /eye/query:
+    post:
+      summary: Returns data of chart by specified parameters
+      tags:
+        - Cloud Eye
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EyeMetricQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EyeMetricQueryResponse"
+        '401':
+          description: Invalid token
+
+  /cts/overview:
+    post:
+      summary: Returns traces from CTS servis
+      tags:
+        - Cloud Trace Service
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraceOverviewRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TraceOverviewResponse"
+        '401':
+          description: Invalid token
+
+  /cts/detail:
+    post:
+      summary: Returns detailed response for specified trace
+      tags:
+        - Cloud Trace Service
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TraceDetailRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TraceDetailResponse"
+        '401':
+          description: Invalid token
+
+  /cce/clusters/overview:
+    post:
+      summary: Returns list of your clusters with some additional parameters
+      tags:
+        - Cloud Container Engine
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClustersOverviewRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClustersOverviewResponse"
+        '401':
+          description: Invalid token
+
+  /aom/metric_list:
+    post:
+      summary: Returns list of metrics for certain cluster
+      tags:
+        - Application Operation Management
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AomMetricListRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AomMetricListResponse"
+        '401':
+          description: Invalid token
+
+  /aom/query:
+    post:
+      summary: Returns data of chart for spicified parameters
+      tags:
+        - Application Operation Management
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AomMetricQueryRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AomMetricQueryResponse"
+        '401':
+          description: Invalid token
+
+  /templates:
+    get:
+      summary: Retrive your tamplates for specified project
+      tags:
+        - Features
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: project_id
+          in: query
+          required: true
+          type: string
+      responses:
+        '200':
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GetTemplatesResponse"
+
+    post:
+      summary: Create new tamplate for chart
+      tags:
+        - Features
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTemplateRequest'
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateTemplateResponse"
+        '401':
+          description: Invalid token
+
+    delete:
+      summary: Delete some of your tamplates
+      tags:
+        - Features
+      security:
+        - bearerAuth: [ ]
+      parameters:
+        - name: project_id
+          in: query
+          required: true
+          type: string
+        - name: template_id
+          in: query
+          required: true
+          type: integer
+          format: int32
+      responses:
+        '204':
+          description: Operation is completed successfully
+        '401':
+          description: Invalid token
+        '404':
+          description: Specified templete not found
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+        - domain_name
+      properties:
+        login:
+          type: string
+          example: user_a
+        password:
+          type: string
+          example: very_secret
+        domain_name:
+          type: string
+          example: domain_a
+
+    LoginResponse:
+      type: object
+      required:
+        - srv_token
+        - status
+      properties:
+        srv_token:
+          description: Token that should be used to access for other urls.
+          type: string
+          example: ab7327923d982d3eb778abf2b14055bc
+        status:
+          description: Describes result of operation
+          type: string
+          example: 200
+
+    ProjectsResponse:
+      type: object
+      required:
+        - response
+        - status
+      properties:
+        response:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProjectsResponseItem'
+        status:
+          type: integer
+          format: int32
+          example: 200
+
+    ProjectsResponseItem:
+      type: object
+      required:
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: string
+          example: 0b9918507f08f2f54c0c00ef8b27eb35
+        name:
+          type: string
+          example: "ru-moscow-1"
+        description:
+          type: string
+          example: "My default project"
+
+    EyeMetricListRequest:
+      type: object
+      required:
+        - project_id
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+
+    EyeMetricListResponse:
+      type: object
+      required:
+        - metrics
+      properties:
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/EyeMetricListResponseItem'
+
+    EyeMetricListResponseItem:
+      type: object
+      required:
+        - id
+        - name
+        - metric_name
+      properties:
+        id:
+          type: string
+          example: "SYS.VPC"
+        name:
+          type: string
+          example: "Elastic IP and bandwidth"
+        metric_name:
+          type: string
+          example: "upstream_bandwidth_usage"
+
+    EyeMetricQueryRequest:
+      type: object
+      required:
+        - project_id
+        - namespace
+        - metric_name
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+        duration_sec:
+          type: integer
+          format: int32
+          descrtiption: Latest seconds that should be included into chart
+          example: 3600
+        namespace:
+          type: string
+          example: SYS.EVS
+          descrtiption: Specified namespace that can be gotten at `/v1/eye/metric_list`
+        metric_name:
+          type: string
+          example: disk_device_write_bytes_rate
+          descrtiption: Specified metric_name that can be gotten at `/v1/eye/metric_list`
+
+    EyeMetricQueryResponse:
+      type: object
+      required:
+        - datapoints
+      properties:
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/EyeMetricQueryResponseItem'
+
+    EyeMetricQueryResponseItem:
+      type: object
+      required:
+        - average
+        - timestamp
+        - unit
+      properties:
+        average:
+          type: number
+          format: float
+          example: 132450.21
+        timestamp:
+          type: number
+          format: float
+          example: 1614492300000
+        unit:
+          type: string
+          example: "B/s"
+
+    TraceOverviewRequest:
+      type: object
+      required:
+        - project_id
+        - duration_sec
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+        duration_sec:
+          type: integer
+          format: int32
+          descrtiption: Latest seconds that should be included into reponse
+          example: 3600
+
+    TraceOverviewResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/TraceOverviewResponseItem'
+
+    TraceOverviewResponseItem:
+      type: object
+      required:
+        - Id
+        - "Trace Name"
+        - "Resource Type"
+        - "Trace Status"
+        - "Operator"
+        - "Operation Time"
+        - "Details"
+      properties:
+        Id:
+          type: string
+          example: "c65bd2b7-794b-11eb-83ad-5f819c13e61b"
+        Trace Name:
+          type: string
+          example: "updateRouter"
+        Resource Type:
+          type: string
+          example: "routers"
+        Trace Status:
+          type: string
+          example: "normal"
+        Operator:
+          type: string
+          example: "hackathon104/cce_admin_trust"
+        Operation Time:
+          type: integer
+          format: int64
+          example: 1614426505442
+        Details:
+          type:
+            - string
+            - null
+          example: null
+
+    TraceDetailRequest:
+      type: object
+      required:
+        - project_id
+        - trace_id
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+        duration_sec:
+          type: integer
+          format: int32
+          descrtiption: Latest seconds that should be included into chart
+          example: 3600
+        trace_id:
+          type: string
+          example: "b2aee5f6-0ac0-11eb-8781-5f8b2713e61b"
+          descrtiption: Specified namespace that can be gotten at `/v1/cts/overview`
+
+    TraceDetailResponse:
+      type: object
+      description: For more information, please, use SberCloud documentation
+      example: {
+        "request": {
+          "port": {
+            "name": "0b965564158026892f0ac00e10148781",
+            "qos_policy_id": "9b392262-11da-4699-a5c3-6aee747d0b62",
+            "binding:profile": {
+              "NOTIFY_STATUS": "NOTIFYED",
+              "bandwith_Info": {
+                "bandwidthType": "PER",
+                "bandwidthId": "9b392262-11da-4699-a5c3-6aee747d0b62",
+                "bandwidthName": "utyrtrdf-50697-bandwidth-5cc9",
+                "bandwidthNumber": 5
+              },
+              "local_network_port": "8458c1b4-d0aa-4c0f-9ecf-33b224e654ae",
+              "createTime": "2021-02-27 11:48:22",
+              "external_networktype": "5_bgp",
+              "standalone": "true"
+            }
+          }
+        },
+        "trace_id": "b2aee5f6-78f1-11eb-8f28-5f819c13e61b",
+        "code": "200",
+        "trace_name": "updatePort",
+        "resource_type": "ports",
+        "api_version": "v2.0",
+        "source_ip": "10.20.17.69",
+        "trace_type": "ApiCall",
+        "service_type": "VPC",
+        "event_type": "system",
+        "project_id": "0b965564158026892f0ac00e10148781",
+        "response": {
+          "port": {
+            "tenant_id": "",
+            "port_security_enabled": false,
+            "binding:vif_type": "unbound",
+            "allowed_address_pairs": [ ],
+            "extra_dhcp_opts": [ ],
+            "description": "",
+            "created_at": "2021-02-27T11:48:21",
+            "binding:vnic_type": "normal",
+            "binding:host_id": "",
+            "updated_at": "2021-02-27T11:48:23",
+            "project_id": "",
+            "mac_address": "fa:16:3e:a6:15:35",
+            "admin_state_up": true,
+            "id": "490a4ebc-9c25-4223-b31c-2e68002d4e7a",
+            "binding:vif_details": { },
+            "device_id": "a383e3f9-454f-4405-85f0-9593f4ba9b3c",
+            "binding:profile": {
+              "NOTIFY_STATUS": "NOTIFYED",
+              "local_network_port": "8458c1b4-d0aa-4c0f-9ecf-33b224e654ae",
+              "bandwith_Info": {
+                "bandwidthType": "PER",
+                "bandwidthName": "utyrtrdf-50697-bandwidth-5cc9",
+                "bandwidthNumber": 5,
+                "bandwidthId": "9b392262-11da-4699-a5c3-6aee747d0b62"
+              },
+              "createTime": "2021-02-27 11:48:22",
+              "external_networktype": "5_bgp",
+              "standalone": "true"
+            },
+            "device_owner": "network:floatingip",
+            "tags": [ ],
+            "security_groups": [ ],
+            "network_id": "ac420354-8456-4d80-af81-3d76b2dff3e1",
+            "fixed_ips": [
+              {
+                "subnet_id": "fb20cceb-6141-4d02-b29d-2df0272800f8",
+                "ip_address": "37.230.195.84"
+              }
+            ],
+            "instance_id": "",
+            "qos_policy_id": "9b392262-11da-4699-a5c3-6aee747d0b62",
+            "name": "0b965564158026892f0ac00e10148781",
+            "ecs_flavor": "",
+            "instance_type": "",
+            "status": "N/A"
+          }
+        },
+        "resource_id": "490a4ebc-9c25-4223-b31c-2e68002d4e7a",
+        "tracker_name": "system",
+        "trace_status": "normal",
+        "time": 1614426503808,
+        "resource_name": "0b965564158026892f0ac00e10148781",
+        "request_id": "",
+        "user": {
+          "domain": {
+            "name": "hackathon104",
+            "id": "0b9655640c0026890f07c00ecd4b43c0"
+          },
+          "name": "hackathon104/op_service",
+          "id": "0b965564250026894f0cc00ebbb9a7f5",
+          "assumed_by": "{\"user\": {\"id\": \"0730485cf30024f51f0cc00889f198dd\", \"domain\": {\"name\": \"op_service\", \"id\": \"db825028aa7648a99522c3fe63d32abd\"}, \"name\": \"vpc_admin_new\", \"password_expires_at\": \"\"}} {\"name\": \"hackathon104/cce_admin_trust\", \"id\": \"0b9879631c0024aa4fc3c00edf8ebe82\"}"
+        },
+        "record_time": 1614426504519
+      }
+
+    ClustersOverviewRequest:
+      type: object
+      required:
+        - project_id
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+
+    ClustersOverviewResponse:
+      type: object
+      required:
+        - clusters
+      properties:
+        clusters:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClustersOverviewResponseItem'
+
+    ClustersOverviewResponseItem:
+      type: object
+      required:
+        - uid
+        - name
+        - update_at
+        - status
+      properties:
+        uid:
+          type: string
+          example: 04ae5cbe-78ef-11eb-a4af-0255ac100042
+        name:
+          type: string
+          example: primary_cluster
+        update_at:
+          type: number
+          format: float
+          example: 1614415762.147394
+          descrtiption: When cluster was updated
+        status:
+          type: string
+          example: Available
+        flavor:
+          type: string
+          example: cce.s2.small
+
+    AomMetricListRequest:
+      type: object
+      required:
+        - project_id
+        - cluster_name
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+        cluster_name:
+          type: string
+          example: Primary cluster
+          descrtiption: Cluster name. Use `/v1/cce/clusters/overview` to get them
+
+    AomMetricListResponse:
+      type: object
+      required:
+        - metrics
+      properties:
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/AomMetricListResponseItem'
+
+    AomMetricListResponseItem:
+      type: object
+      required:
+        - namespace
+        - cluster_name
+        - unit
+      properties:
+        namespace:
+          type: string
+          example: PAAS.CONTAINER
+        metricName:
+          type: string
+          example: memCapacity
+        unit:
+          type: string
+          example: Megabytes
+
+    AomMetricQueryRequest:
+      type: object
+      required:
+        - project_id
+        - namespace
+        - metric_name
+        - cluster_name
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+        namespace:
+          type: string
+          example: PAAS.AGGR. Use `/v1/aom/query` to get them
+        metric_name:
+          type: string
+          example: memUsedRate. Use `/v1/aom/query` to get them
+        cluster_name:
+          type: string
+          example: Primary cluster
+          descrtiption: Cluster name. Use `/v1/cce/clusters/overview` to get them
+
+    AomMetricQueryResponse:
+      type: object
+      required:
+        - points
+      properties:
+        points:
+          type: array
+          items:
+            $ref: '#/components/schemas/AomMetricQueryResponseItem'
+
+    AomMetricQueryResponseItem:
+      type: object
+      required:
+        - timestamp
+        - average
+        - unit
+      properties:
+        timestamp:
+          type: intger
+          format: int64
+          example: 1614500640000
+        average:
+          type: number
+          format: float
+          example: 6.415
+        unit:
+          type: string
+          example: Percent
+
+    CreateTemplateRequest:
+      type: object
+      required:
+        - project_id
+        - name
+        - raw_data
+      properties:
+        project_id:
+          type: string
+          example: 0b991852f0ac00e10148781f8b27eb35
+        name:
+          type: string
+          example: Name of new template
+        raw_data:
+          type: object
+          descrtiption: You can save additional information to make the same request later
+          example: {"url": "http://url/to/save", "servis": "some_service"}
+
+    GetTemplatesResponse:
+      type: object
+      required:
+        - metrics
+      properties:
+        metrics:
+          type: array
+          items:
+            $ref: '#/components/schemas/GetTemplatesResponseItem'
+
+    GetTemplatesResponseItem:
+      type: object
+      required:
+        - timestamp
+        - average
+        - unit
+      properties:
+        id:
+          type: intger
+          format: int32
+          example: 1614
+        raw_data:
+          type: object
+          example: {"url": "http://url/to/save", "servis": "some_service"}
+        name:
+          type: string
+          example: My favorite template
+
+    CreateTemplateResponse:
+      type: object
+      required:
+        - template_id
+        - status
+      properties:
+        template_id:
+          type: integer
+          format: int32
+          example: 1555783
+          descrtiption: ID of created template
+        status:
+          type: integer
+          format: int32
+          example: 200
+          description: Describes result of operation

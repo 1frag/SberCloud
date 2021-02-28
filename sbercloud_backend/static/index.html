@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Swagger</title>
+    <link rel="stylesheet" type="text/css" href="/spec/swagger-ui.css" >
+</head>
+<body>
+<div id="swagger-ui"></div>
+<script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js" charset="UTF-8"></script>
+<script>
+    window.onload = function() {
+        window.ui = SwaggerUIBundle({
+          url: location.protocol + '//' + location.host + "/spec/spec.yaml",
+          dom_id: "#swagger-ui",
+          deepLinking: true,
+          plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+      });
+    };
+</script>
+</body>
+</html>
